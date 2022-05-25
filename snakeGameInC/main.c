@@ -44,14 +44,14 @@ int main(){
 	FOOD* f = malloc(sizeof(FOOD));
 	srand(time(NULL));
 	const char *dev = "/dev/input/event0";
-    struct input_event ev;
-    int fd;
+	struct input_event ev;
+	int fd;
 
-    fd = open(dev, O_RDONLY);
-    if (fd == -1) {
-        fprintf(stderr, "Cannot open %s: %s.\n", dev, strerror(errno));
-        return EXIT_FAILURE;
-    }
+	fd = open(dev, O_RDONLY);
+	if (fd == -1) {
+		fprintf(stderr, "Cannot open %s: %s.\n", dev, strerror(errno));
+		return EXIT_FAILURE;
+	}
 
 
 	char in=0;
