@@ -8,4 +8,4 @@ snake.o: snake.c snake.h
 	gcc snake.c -c -o snake.o
 
 clean:
-	rm main.o plane.o
+	rm main.o plane.o snake.o
