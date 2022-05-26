@@ -110,7 +110,7 @@ void gameOver(int m, int n, char** plane,SNAKE* s){
 		printf("\n");
 		
 	}
-	int y=m/2-2,x;
+	int y=m/2-1,x;
 	if(n/2-7>0){
 		x=n/2-6;
 	}
