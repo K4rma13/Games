@@ -70,13 +70,28 @@ bool snakeDead(SNAKE* s,int m,int n){
 void snakeAte(SNAKE* s, FOOD* f,int m,int n){
 	if((s->pontos->x%(n-2))+1==f->y&&(s->pontos->y%(m-2))+1==f->x){
 		s->ateFood=true;
-		createFood(f,m,n);
+		createFood(f,s,m,n);
 	}
 }
 
-void createFood(FOOD* f,int m,int n){
+bool isInSnake(LPonto s, FOOD* f,int m,int n){
+	LPonto aux = s;
+	while(aux!=NULL){
+		if((aux->x%(n-2))+1 == f->y && (aux->y%(m-2))+1==f->x){
+			return true;
+		}
+		aux=aux->next;
+	}
+	return false;
+}
+
+void createFood(FOOD* f,SNAKE* s,int m,int n){
 	f->x=rand()%(n-2)+1;
 	f->y=rand()%(m-2)+1;
+	while(isInSnake(s->pontos,f,m,n)){
+		f->x=rand()%(n-2)+1;
+		f->y=rand()%(m-2)+1;
+	}
 }
 
 void increaseSpeed(SNAKE* s,float* time){

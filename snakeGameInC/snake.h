@@ -32,7 +32,7 @@ typedef struct food{
 }FOOD;
 
 
-void createFood(FOOD* f,int m,int n);
+void createFood(FOOD* f,SNAKE* s,int m,int n);
 
 void snakeAte(SNAKE* s, FOOD* f,int m,int n);
 

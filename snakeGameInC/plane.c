@@ -46,7 +46,7 @@ void printPlane(char** plane, int m, int n, SNAKE* s){
 		printf("\n");
 		
 	}
-	printf("\x1b[30;48;2;221;216;196mSize: %d\n\x1b[0m",s->size);
+	printf("\x1b[30;48;2;221;216;196mSize: %d\n\x1b[0m\x1b[?25l\x1b[30m\n",s->size);
 }
 
 void drawFood(FOOD* f, char** plane,int m, int n){
@@ -111,8 +111,8 @@ void gameOver(int m, int n, char** plane,SNAKE* s){
 		
 	}
 	int y=m/2-2,x;
-	if(n/2-9>0){
-		x=n/2-9;
+	if(n/2-7>0){
+		x=n/2-6;
 	}
 	else{
 		x=0;
@@ -125,6 +125,7 @@ void gameOver(int m, int n, char** plane,SNAKE* s){
 	printf("\x1b[30;48;2;221;216;196m   Score:%3d   \n",s->size);
 	printf("\x1b[%d;%dH",y+3,x);
 	printf("\x1b[30;48;2;221;216;196m===============\n");
+	printf("\x1b[%d;%dH\x1b[0m\x1b[30m",m+5,n);
 	getchar();
 	exit(1);
 }

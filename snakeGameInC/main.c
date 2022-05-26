@@ -44,7 +44,7 @@ void keyboard(SNAKE* s, int code){
 
 
 int main(){
-	int m = 15, n = 15;
+	int m = 13, n = 13;
 	int x=5,y=5;
 
 	SNAKE* s = malloc(sizeof(SNAKE));
@@ -89,7 +89,7 @@ int main(){
 		char in=0;
 		char** plane = createPlane(m,n);
 		int keypress;
-		createFood(f,m,n);
+		createFood(f,s,m,n);
 		setSnake(s,x,y,RIGHT);
 		do{
 			if(newdata){
