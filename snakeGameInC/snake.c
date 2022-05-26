@@ -1,6 +1,7 @@
 #include "snake.h"
 
 void setSnake(SNAKE* s,int x, int y, int dir){
+	s->size=6;
 	s->ateFood=false;
 	s->dir=RIGHT;
 	s->pontos=malloc(sizeof(LPonto));
@@ -36,6 +37,7 @@ void updateSnake(SNAKE* s){
 		s->pontos->x++;
 	}
 	if(!s->ateFood){
+
 		LPonto n = aux;
 		while(n->next->next!=NULL){ 
 			n=n->next; 
@@ -44,6 +46,7 @@ void updateSnake(SNAKE* s){
 
 	}
 	else{
+		s->size++;
 		s->ateFood=false;
 	}
 }
@@ -69,21 +72,13 @@ void snakeAte(SNAKE* s, FOOD* f,int m,int n){
 		s->ateFood=true;
 		createFood(f,m,n);
 	}
-	else if((s->pontos->x%(n-2))+1==f->y&&(s->pontos->y%(m-2))+1==f->x+1){
-		s->ateFood=true;
-		createFood(f,m,n);
-	}
-	else if((s->pontos->x%(n-2))+1==f->y+1&&(s->pontos->y%(m-2))+1==f->x){
-		s->ateFood=true;
-		createFood(f,m,n);
-	}
-	else if((s->pontos->x%(n-2))+1==f->y+1&&(s->pontos->y%(m-2))+1==f->x+1){
-		s->ateFood=true;
-		createFood(f,m,n);
-	}
 }
 
 void createFood(FOOD* f,int m,int n){
-	f->x=rand()%(n-3)+1;
-	f->y=rand()%(m-3)+1;
+	f->x=rand()%(n-2)+1;
+	f->y=rand()%(m-2)+1;
+}
+
+void increaseSpeed(SNAKE* s,float* time){
+	*time=0.1-((s->size/3)*0.005);
 }

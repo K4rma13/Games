@@ -9,7 +9,7 @@ char** createPlane(int m, int n);
 
 void resetPlane(char** plane, int m, int n);
 
-void printPlane(char** plane, int m, int n);
+void printPlane(char** plane, int m, int n, SNAKE* s);
 
 void drawSnake(SNAKE* s, char** plane,int m, int n);
 
@@ -17,6 +17,6 @@ void drawBody(LPonto s, char** plane,int m, int n);
 
 void drawFood(FOOD* f, char** plane,int m, int n);
 
-void gameOver(int m, int n);
+void gameOver(int m, int n, char** plane,SNAKE* s);
 
 #endif

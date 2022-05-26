@@ -23,6 +23,7 @@ typedef struct snake{
 	LPonto pontos;
 	int dir;
 	bool ateFood;
+	int size;
 }SNAKE;
 
 typedef struct food{
@@ -41,5 +42,6 @@ void setSnake(SNAKE* s,int x, int y, int dir);
 
 void updateSnake(SNAKE* s);
 
+void increaseSpeed(SNAKE* s,float* time);
 
 #endif
