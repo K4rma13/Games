@@ -58,7 +58,8 @@ int main(){
 	pipe(pipek);
 	//Child process handles keystrokes
 	if((pid=fork())==0){
-		//Keyboard buffer path
+		//Keyboard buffer path /dev/input/event* using this command:
+		//grep -E  'Handlers|EV=' /proc/bus/input/devices | \grep -B1 'EV=120013' | \grep -Eo 'event[0-9]+'
 		const char *dev = "/dev/input/event0";
 		struct input_event ev;
 		int fd;
