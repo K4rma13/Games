@@ -59,11 +59,11 @@ void drawSnake(SNAKE* s, char** plane,int m, int n){
 	LPonto head = s->pontos;
 	drawBody(head->next,plane,m,n);
 	if((head->y)<=0){
-		head->y=n-2;
+		head->y=m-2;
 	}
 	y=((head->y)%(m-2))+1;
 	if((head->x)<=0){
-		head->x=m-2;
+		head->x=n-2;
 	}
 	x=((head->x)%(n-2))+1;
 	plane[y][x]=3;
@@ -72,11 +72,11 @@ void drawSnake(SNAKE* s, char** plane,int m, int n){
 void drawBody(LPonto s, char** plane,int m, int n){
 	int y,x;
 	if((s->y)<=0){
-		s->y=n-2;
+		s->y=m-2;
 	}
 	y=((s->y)%(m-2))+1;
 	if((s->x)<=0){
-		s->x=m-2;
+		s->x=n-2;
 	}
 	x=((s->x)%(n-2))+1;
 	plane[y][x]=2;

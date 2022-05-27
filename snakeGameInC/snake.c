@@ -86,11 +86,11 @@ bool isInSnake(LPonto s, FOOD* f,int m,int n){
 }
 
 void createFood(FOOD* f,SNAKE* s,int m,int n){
-	f->x=rand()%(n-2)+1;
-	f->y=rand()%(m-2)+1;
+	f->x=rand()%(m-2)+1;
+	f->y=rand()%(n-2)+1;
 	while(isInSnake(s->pontos,f,m,n)){
-		f->x=rand()%(n-2)+1;
-		f->y=rand()%(m-2)+1;
+		f->x=rand()%(m-2)+1;
+		f->y=rand()%(n-2)+1;
 	}
 }
 
