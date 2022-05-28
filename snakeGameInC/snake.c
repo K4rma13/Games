@@ -95,5 +95,5 @@ void createFood(FOOD* f,SNAKE* s,int m,int n){
 }
 
 void increaseSpeed(SNAKE* s,float* time){
-	*time=0.1-((s->size/3)*0.005);
+	*time=0.2-((s->size/3)*0.005);
 }
