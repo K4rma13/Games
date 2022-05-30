@@ -44,7 +44,7 @@ void keyboard(SNAKE* s, int code){
 
 
 int main(){
-	int m = 13, n = 13;
+	int m = 21, n = 21;
 	int x=5,y=5;
 
 	SNAKE* s = malloc(sizeof(SNAKE));
