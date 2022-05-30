@@ -1,6 +1,6 @@
 #! /usr/bin/python3
 
-from math import cos, sin, pi, floor, atan
+from math import sin, pi, floor, sqrt, acos, atan, cos
 import curses
 from curses import wrapper
 import subprocess
@@ -8,7 +8,8 @@ from random import randrange
 
 x=180
 y=91
-
+mX=5
+mY=5
 
 def refresh():
 	for i in range(y):
@@ -23,8 +24,10 @@ def refresh():
 				stdscr.addch(i,j," ",curses.color_pair(6))
 			elif plane[i][j]== "Y":
 				stdscr.addch(i,j," ",curses.color_pair(3))
+			elif plane[i][j]== "#":
+				stdscr.addch(i,j," ",curses.color_pair(7))
 			else:
-				stdscr.addch(i,j,plane[i][j],curses.color_pair(2))
+				stdscr.addstr(i,j,plane[i][j],curses.color_pair(2))
 			plane[i][j]=" "
 	stdscr.refresh()
 
@@ -89,7 +92,7 @@ class pos:
 				plane[j+ay][ax+i]="Y"
 
 def goTo(x2,y2):
-	if y2>=0 and y2<22 and x2>=0 and x2<22 and not quadrados[y2][x2].visited :
+	if y2>=0 and y2<mY and x2>=0 and x2<mX and not quadrados[y2][x2].visited :
 		stack.append(pos(p.x,p.y))
 		quadrados[y2][x2].visited=True
 		if y2-p.y == 1:
@@ -119,10 +122,11 @@ stdscr.idlok(False)
 curses.noecho()
 curses.start_color()
 curses.init_color(0,0,0,0)
-curses.init_color(1,900,900,900)
+curses.init_color(1,800,800,800)
 curses.init_pair(1,0,1)
 curses.init_pair(2,1,0)
 
+#Gray color
 curses.init_color(2,700,700,700)
 curses.init_color(3,500,500,500)
 curses.init_color(4,300,300,300)
@@ -130,12 +134,13 @@ curses.init_pair(4,0,2)
 curses.init_pair(5,0,3)
 curses.init_pair(6,0,4)
 
-curses.init_color(4,300,300,300)
-curses.init_pair(7,0,5)
+#Edge color
+curses.init_color(6,400,400,420)
+curses.init_pair(7,4,6)
 
-curses.init_color(5,0,1000,0)
+curses.init_color(5,0,700,100)
 curses.init_pair(3,0,5)
-quadrados = [[quadrado(xq,yq) for xq in range(0,88,4)] for yq in range(0,88,4) ]
+quadrados = [[quadrado(xq,yq) for xq in range(0,mX*4,4)] for yq in range(0,mY*4,4) ]
 startx = 0
 starty = 0
 p = pos(startx,starty)
@@ -164,27 +169,29 @@ while stack:
 		if not ( goTo(p.x-1,p.y) or goTo(p.x,p.y-1) or goTo(p.x,p.y+1) or goTo(p.x+1,p.y)):
 			p = stack.pop()
 	#subprocess.run(['sleep','0.01'])
+
+
+class Edges:
+	x=0
+	y=0
+	d=0
+	def __init__(self,x,y,d):
+		self.x=x
+		self.y=y
+		self.d=d
+def getDist(e):
+	return e.d
+
+
 def edgesAux(x1,y1):
-	minimo=(x1-player.x)**2+(y1-player.y)**2
-	bestx=x1
-	besty=y1
-	for ky in range(2):
-		for kx in range(2):
-			if((x1+kx-player.x)**2+(y1+ky-player.y)**2<minimo):
-				minimo=(x1+kx-player.x)**2+(y1+ky-player.y)**2
-				bestx=x1+kx
-				besty=y1+ky
-	if bestx==player.x:
-		return 500
-	a = atan((besty-player.y)/(bestx-player.x))
-	if bestx-player.x<0:
-		a=a+pi
-	return a
+	if (x1%1 < 0.1 or x1%1>0.9) and (y1%1 < 0.1 or y1%1>0.9):
+		return True
+	return False
 
 
 def povDraw():
 	c=0
-	for angle in range(-45,45):
+	for angle in range(-90,90):
 		green=False
 		pixels2=0
 		edge=False
@@ -192,49 +199,98 @@ def povDraw():
 		dgray=False
 		gray=False
 		lgray=False
-		for d in range(0,1200,1):
-			d1 = d/100
-			if maze[floor(d1*sin((angle/180+player.a)*pi)+player.y)][floor(d1*cos((angle/180+player.a)*pi)+player.x)]=="X":
-				#edges
-				xqa=floor(d1*cos((angle/180+player.a)*pi)+player.x)
-				yqa=floor(d1*sin((angle/180+player.a)*pi)+player.y)
-				edgeA = edgesAux(xqa,yqa)
-				if edgeA-0.02 <= (angle/180+player.a)*pi <= edgeA+0.02:
-					edge=True
-				#coloring
-				if floor(d1*sin((angle/180+player.a)*pi)+player.y) >80 and floor(d1*cos((angle/180+player.a)*pi)+player.x) > 80 and ((floor(d1*sin((angle/180+player.a)*pi)+player.y)%2 or floor(d1*sin((angle/180+player.a)*pi)+player.y))%2):
-					green=True
-				rd = d1*sin(pi/2-abs(angle/180+player.a))
-				if d1<3:
-					white=True
-				elif d1<6:
-					lgray=True
-				elif d1<9:
-					gray=True
-				else:
-					dgray=True
-				pixels2 = floor((100-(rd/12*70+20))/2)
-				break
+		#for d in range(0,1200,10):
+		#	d1 = d/100
+		aAngle = (angle/540+player.a)*pi
+		dirX = cos(aAngle)
+		dirY = sin(aAngle)
+		if dirX == 0:
+			stepSizex = 900000
+			stepSizey = 1
+		else:
+			stepSizex= sqrt(1+(dirY/dirX)*(dirY/dirX))
+		if dirY == 0:
+			stepSizey = 900000
+			stepSizex = 1
+		else:
+			stepSizey= sqrt(1+(dirX/dirY)*(dirX/dirY))
+		mapcheckX = floor(player.x)
+		mapcheckY = floor(player.y)
+		
+		if dirX < 0:
+			stepX = -1
+			distX = (player.x - mapcheckX) * stepSizex
+		else:
+			stepX = 1
+			distX = (mapcheckX+1 - player.x) * stepSizex
+		if dirY < 0:
+			stepY = -1
+			distY = (player.y - mapcheckY) * stepSizey
+		else:
+			stepY = 1
+			distY = (mapcheckY+1 - player.y) * stepSizey
+		dist=0
+		foundWall=False
+		while dist<20 and not foundWall:
+			if(distY>distX):
+				mapcheckX+= stepX
+				dist=distX
+				distX+= stepSizex
+				
+			else:
+				mapcheckY+= stepY
+				dist=distY
+				distY+= stepSizey
+				
+			#if mapcheckX>=0 and mapcheckX<mX and mapcheckY>=0 and mapcheckY<mY:
+			if maze[mapcheckY][mapcheckX]=="X":
+				foundWall=True
+
+		if foundWall:
+			#edges
+			d1 = dist
+			xqa=d1*cos(aAngle)+player.x
+			yqa=d1*sin(aAngle)+player.y
+			if edgesAux(xqa,yqa):
+				edge=True
+			#coloring
+			if floor(d1*sin(aAngle)+player.y) >mY*4-8 and floor(d1*cos(aAngle)+player.x) > mX*4-8 and ((floor(d1*sin(aAngle)+player.y)%2 or floor(d1*sin(aAngle)+player.y))%2):
+				green=True
+			rd = abs(d1*cos(angle/540*pi))
+			if d1<3:
+				white=True
+			elif d1<6:
+				lgray=True
+			elif d1<9:
+				gray=True
+			else:
+				dgray=True
+			#pixels2 = floor((90-(rd/20*90))/2)
+			#pixels2= floor((90-rd*4)/2)
+			if rd<1:
+				rd=1
+			pixels2= round(90/rd)
+			#stdscr.addstr(floor(c/2),0,f'{rd}')
+		
 		for size in range(-pixels2,pixels2):
+			center=47
+			height=size+center
+			if height>90:
+				height=90
+			if height<0:
+				height=0
 			if green:
-				plane[size+52][c]="Y"
-				plane[size+52][c+1]="Y"
+				plane[height][angle+90]="Y"
 			elif edge:
-				plane[size+52][c]="#"
-				plane[size+52][c+1]="#"
+				plane[height][angle+90]="#"
 			elif white:
-				plane[size+52][c]="X"
-				plane[size+52][c+1]="X"
+				plane[height][angle+90]="X"
 			elif dgray:
-				plane[size+52][c]="J"
-				plane[size+52][c+1]="J"
+				plane[height][angle+90]="J"
 			elif gray:
-				plane[size+52][c]="H"
-				plane[size+52][c+1]="H"
+				plane[height][angle+90]="H"
 			elif lgray:
-				plane[size+52][c]="G"
-				plane[size+52][c+1]="G"
-		c+=2
+				plane[height][angle+90]="G"
 
 class Player:
 	x=0
@@ -249,7 +305,7 @@ class Player:
 		self.y+= d*sin(self.a*pi)
 
 player = Player(2,2)
-subprocess.run(['sleep','2'])
+subprocess.run(['sleep','0.5'])
 
 while 1:
 	for j in range(57,y):
@@ -258,9 +314,12 @@ while 1:
 				plane[j][i]="x"
 			else:
 				plane[j][i]="."
-
+	#stdscr.clear()
 	povDraw()
 	refresh()
+	stdscr.addstr(0,30,f'x:{player.x} y:{player.y} Angle:{player.a}')
+
+	stdscr.refresh()
 	key = stdscr.getkey()
 	if key=="a":
 		player.angle-=0.05
