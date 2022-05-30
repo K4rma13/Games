@@ -117,32 +117,34 @@ curses.init_pair(1,0,1)
 curses.init_pair(2,1,0)
 curses.init_color(2,0,1000,0)
 curses.init_pair(3,0,2)
-quadrados = [[quadrado(xq,yq) for xq in range(0,88,4)] for yq in range(0,88,4) ]
-startx = 0
-starty = 0
-p = pos(startx,starty)
-stack = [ pos(startx,starty) ]
-quadrados[starty][startx].visited=True
-while stack:
-	for qlinha in quadrados:
-		for q in qlinha:
-			q.draw()
-	p.draw()
-	refresh()
-	k = randrange(4)
-	if k==0:
-		if not (goTo(p.x,p.y-1) or goTo(p.x+1,p.y) or goTo(p.x-1,p.y) or goTo(p.x,p.y+1) ):
-			p = stack.pop()
-	elif k==1:
-		if not (goTo(p.x-1,p.y) or goTo(p.x,p.y-1) or goTo(p.x+1,p.y) or goTo(p.x,p.y+1)):
-			p = stack.pop()
-	elif k==2:
-		if not (goTo(p.x,p.y+1) or goTo(p.x+1,p.y) or goTo(p.x-1,p.y) or goTo(p.x,p.y-1)):
-			p = stack.pop()
-	elif k==3:
-		if not ( goTo(p.x-1,p.y) or goTo(p.x,p.y-1) or goTo(p.x,p.y+1) or goTo(p.x+1,p.y)):
-			p = stack.pop()
-	subprocess.run(['sleep','0.01'])
+while True:
+	quadrados = [[quadrado(xq,yq) for xq in range(0,88,4)] for yq in range(0,88,4) ]
+	startx = 0
+	starty = 0
+	p = pos(startx,starty)
+	stack = [ pos(startx,starty) ]
+	quadrados[starty][startx].visited=True
+	while stack:
+		for qlinha in quadrados:
+			for q in qlinha:
+				q.draw()
+		p.draw()
+		refresh()
+		k = randrange(4)
+		if k==0:
+			if not (goTo(p.x,p.y-1) or goTo(p.x+1,p.y) or goTo(p.x-1,p.y) or goTo(p.x,p.y+1) ):
+				p = stack.pop()
+		elif k==1:
+			if not (goTo(p.x-1,p.y) or goTo(p.x,p.y-1) or goTo(p.x+1,p.y) or goTo(p.x,p.y+1)):
+				p = stack.pop()
+		elif k==2:
+			if not (goTo(p.x,p.y+1) or goTo(p.x+1,p.y) or goTo(p.x-1,p.y) or goTo(p.x,p.y-1)):
+				p = stack.pop()
+		elif k==3:
+			if not ( goTo(p.x-1,p.y) or goTo(p.x,p.y-1) or goTo(p.x,p.y+1) or goTo(p.x+1,p.y)):
+				p = stack.pop()
+		subprocess.run(['sleep','0.05'])
+	subprocess.run(['sleep','5'])
 
 stdscr.getch()
 curses.endwin()
