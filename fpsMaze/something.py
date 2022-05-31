@@ -3,13 +3,16 @@
 from math import sin, pi, floor, sqrt, acos, atan, cos
 import curses
 from curses import wrapper
+import keyboard
 import subprocess
 from random import randrange
+from time import time
 
-x=180
-y=91
-mX=5
-mY=5
+y=196
+x=y*2
+
+mX=10
+mY=10
 
 def refresh():
 	for i in range(y):
@@ -191,8 +194,9 @@ def edgesAux(x1,y1):
 
 def povDraw():
 	c=0
-	for angle in range(-90,90):
-		green=False
+	for angle in range(floor(-x/2),floor(x/2)):
+		green1=False
+		green2=False
 		pixels2=0
 		edge=False
 		white=False
@@ -201,7 +205,7 @@ def povDraw():
 		lgray=False
 		#for d in range(0,1200,10):
 		#	d1 = d/100
-		aAngle = (angle/540+player.a)*pi
+		aAngle = (angle/(x*3)+player.a)*pi
 		dirX = cos(aAngle)
 		dirY = sin(aAngle)
 		if dirX == 0:
@@ -231,7 +235,7 @@ def povDraw():
 			distY = (mapcheckY+1 - player.y) * stepSizey
 		dist=0
 		foundWall=False
-		while dist<20 and not foundWall:
+		while dist<30 and not foundWall:
 			if(distY>distX):
 				mapcheckX+= stepX
 				dist=distX
@@ -254,43 +258,50 @@ def povDraw():
 			if edgesAux(xqa,yqa):
 				edge=True
 			#coloring
-			if floor(d1*sin(aAngle)+player.y) >mY*4-8 and floor(d1*cos(aAngle)+player.x) > mX*4-8 and ((floor(d1*sin(aAngle)+player.y)%2 or floor(d1*sin(aAngle)+player.y))%2):
-				green=True
-			rd = abs(d1*cos(angle/540*pi))
-			if d1<3:
-				white=True
-			elif d1<6:
+			if floor(d1*sin(aAngle)+player.y) >mY*4-4 and floor(d1*cos(aAngle)+player.x) > mX*4-4 and (( yqa%0.2<=0.1 and (xqa%1 < 0.1 or xqa%1>0.9)) or ( xqa%0.2<=0.1 and (yqa%1 < 0.1 or yqa%1>0.9))):
+				green1=True
+			if floor(d1*sin(aAngle)+player.y) >mY*4-4 and floor(d1*cos(aAngle)+player.x) > mX*4-4 and (( yqa%0.2>0.1 and (xqa%1 < 0.1 or xqa%1>0.9)) or ( xqa%0.2>0.1 and (yqa%1 < 0.1 or yqa%1>0.9))):
+				green2=True
+			rd = abs(d1*cos(angle/(x*3)*pi))
+			if (xqa%2<1 and (yqa%1 < 0.1 or yqa%1>0.9)) or (yqa%2>1 and (xqa%1 < 0.1 or xqa%1>0.9)):
 				lgray=True
-			elif d1<9:
-				gray=True
 			else:
 				dgray=True
 			#pixels2 = floor((90-(rd/20*90))/2)
 			#pixels2= floor((90-rd*4)/2)
 			if rd<1:
 				rd=1
-			pixels2= round(90/rd)
+			pixels2= round(y/rd)
 			#stdscr.addstr(floor(c/2),0,f'{rd}')
 		
 		for size in range(-pixels2,pixels2):
-			center=47
+			center=floor(y/2)
 			height=size+center
-			if height>90:
-				height=90
+			halfX = floor(x/2)
+			if height>=y:
+				height=y-1
 			if height<0:
 				height=0
-			if green:
-				plane[height][angle+90]="Y"
+			if green1:
+				if height%2:
+					plane[height][angle+halfX]="Y"
+				else:
+					plane[height][angle+halfX]="#"
+			elif green2:
+				if not height%2:
+					plane[height][angle+halfX]="Y"
+				else:
+					plane[height][angle+halfX]="#"
 			elif edge:
-				plane[height][angle+90]="#"
+				plane[height][angle+halfX]="#"
 			elif white:
-				plane[height][angle+90]="X"
+				plane[height][angle+halfX]="X"
 			elif dgray:
-				plane[height][angle+90]="J"
+				plane[height][angle+halfX]="J"
 			elif gray:
-				plane[height][angle+90]="H"
+				plane[height][angle+halfX]="H"
 			elif lgray:
-				plane[height][angle+90]="G"
+				plane[height][angle+halfX]="G"
 
 class Player:
 	x=0
@@ -303,39 +314,64 @@ class Player:
 	def walk(self,d):
 		self.x+= d*cos(self.a*pi)
 		self.y+= d*sin(self.a*pi)
+	def strafe(self,d):
+		self.x-= d*sin(self.a*pi)
+		self.y+= d*cos(self.a*pi)
 
 player = Player(2,2)
 subprocess.run(['sleep','0.5'])
+stdscr.nodelay(True)
+otime = time()
 
+walkingSpeed=2
+turningSpeed=0.25
+p=pos()
 while 1:
-	for j in range(57,y):
+	atime = time()
+	difftime = atime-otime
+	otime=atime
+	for j in range(floor(y/2),y):
 		for i in range(x):
-			if j>70:
-				plane[j][i]="x"
-			else:
-				plane[j][i]="."
-	#stdscr.clear()
-	povDraw()
-	refresh()
-	stdscr.addstr(0,30,f'x:{player.x} y:{player.y} Angle:{player.a}')
+			plane[j][i]="H"
 
-	stdscr.refresh()
-	key = stdscr.getkey()
-	if key=="a":
-		player.angle-=0.05
-	elif key=="w":
-		player.walk(0.1)
+
+	povDraw()
+	for qlinha in quadrados:
+		for q in qlinha:
+			q.draw()
+	p.x=floor(player.x/4)
+	p.y=floor(player.y/4)
+	p.draw()
+	refresh()
+	if keyboard.is_pressed("q"):
+		player.angle-=turningSpeed*difftime
+
+	if keyboard.is_pressed("w"):
+		player.walk(walkingSpeed*difftime)
 		if maze[floor(player.y)][floor(player.x)] == "X":
-			player.walk(-0.1)
-	elif key=="d":
-		player.angle+=0.05
-	elif key=="s":
-		player.walk(-0.1)
+			player.walk(-walkingSpeed*difftime)
+
+	if keyboard.is_pressed("e"):
+		player.angle+=turningSpeed*difftime
+
+	if keyboard.is_pressed("s"):
+		player.walk(-walkingSpeed*difftime)
 		if maze[floor(player.y)][floor(player.x)] == "X":
-			player.walk(0.1)
-	elif key=="q":
-		player.x=86
-		player.y=86
+			player.walk(walkingSpeed*difftime)
+
+	if keyboard.is_pressed("a"):
+		player.strafe(-walkingSpeed*difftime)
+		if maze[floor(player.y)][floor(player.x)] == "X":
+			player.strafe(walkingSpeed*difftime)
+
+	if keyboard.is_pressed("d"):
+		player.strafe(walkingSpeed*difftime)
+		if maze[floor(player.y)][floor(player.x)] == "X":
+			player.strafe(-walkingSpeed*difftime)
+
+	if keyboard.is_pressed("k"):
+		player.x=mX*4-2
+		player.y=mX*4-2
 	player.a=player.angle%2-1
-	
+	subprocess.run(['sleep','0.005'])
 curses.endwin()
