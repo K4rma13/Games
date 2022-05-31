@@ -8,37 +8,21 @@ import subprocess
 from random import randrange
 from time import time
 
-y=196
+y=240
 x=y*2
 
 mX=10
 mY=10
 
 def refresh():
-	for i in range(y):
-		for j in range(x):
-			if plane[i][j]== "X":
-				stdscr.addch(i,j," ",curses.color_pair(1))
-			elif plane[i][j]== "G":
-				stdscr.addch(i,j," ",curses.color_pair(4))
-			elif plane[i][j]== "H":
-				stdscr.addch(i,j," ",curses.color_pair(5))
-			elif plane[i][j]== "J":
-				stdscr.addch(i,j," ",curses.color_pair(6))
-			elif plane[i][j]== "Y":
-				stdscr.addch(i,j," ",curses.color_pair(3))
-			elif plane[i][j]== "#":
-				stdscr.addch(i,j," ",curses.color_pair(7))
-			else:
-				stdscr.addstr(i,j,plane[i][j],curses.color_pair(2))
-			plane[i][j]=" "
 	stdscr.refresh()
+	stdscr.erase()
 
 def drawCircle(a,b,r):
 	for i in range(y):
 		for j in range(x):
 			if (j-a)**2 + (i-b)**2 <= r*r+r and (j-a)**2 + (i-b)**2 >= r*r-r:
-				plane[i][j]="X"
+				stdscr.addch(i,j," ",curses.color_pair(1))
 
 def drawLine(x1,y1,x2,y2):
 	a=y1-y2
@@ -51,13 +35,25 @@ def drawLine(x1,y1,x2,y2):
 	for i in range(ymin,ymax+1):
 		for j in range(xmin,xmax+1):
 			if (a*j+b*i+c <= 0+10 and a*j+b*i+c >= 0-9):
-				plane[i][j]="X"
+				stdscr.addch(i,j," ",curses.color_pair(1))
 
 def drawLineAngle(x1,y1,d,a):
 	x2=cos(pi*a)*d + x1
 	y2=sin(pi*(-a))*d + y1
 	drawLine(x1,y1,x2,y2)
 
+def drawLineToArray(x1,y1,x2,y2):
+	a=y1-y2
+	b=x2-x1
+	c=x1*y2-x2*y1
+	xmax = max(x1,x2)
+	xmin = min(x1,x2)
+	ymax = max(y1,y2)
+	ymin = min(y1,y2)
+	for i in range(ymin,ymax+1):
+		for j in range(xmin,xmax+1):
+			if (a*j+b*i+c <= 0+10 and a*j+b*i+c >= 0-9):
+				plane[i][j]="X"
 
 class quadrado:
 	x=0
@@ -80,6 +76,18 @@ class quadrado:
 			drawLine(self.x,self.y+self.s,self.x+self.s,self.y+self.s)
 		if self.rig:
 			drawLine(self.x+self.s,self.y,self.x+self.s,self.y+self.s)
+	def drawArray(self):
+		if self.top:
+			drawLineToArray(self.x,self.y,self.x+self.s,self.y)
+		if self.lef:
+			drawLineToArray(self.x,self.y,self.x,self.y+self.s)
+		if self.bot:
+			drawLineToArray(self.x,self.y+self.s,self.x+self.s,self.y+self.s)
+		if self.rig:
+			drawLineToArray(self.x+self.s,self.y,self.x+self.s,self.y+self.s)
+
+
+
 
 class pos:
 	x=0
@@ -92,7 +100,7 @@ class pos:
 		ax=self.x*4+1
 		for j in range(3):
 			for i in range(3):
-				plane[j+ay][ax+i]="Y"
+				stdscr.addch(j+ay,ax+i," ",curses.color_pair(3))
 
 def goTo(x2,y2):
 	if y2>=0 and y2<mY and x2>=0 and x2<mX and not quadrados[y2][x2].visited :
@@ -120,6 +128,7 @@ def goTo(x2,y2):
 plane = [[" " for cols in range(x)] for rows in range(y)] 
 
 stdscr = curses.initscr()
+curses.curs_set(0)
 stdscr.idcok(False)
 stdscr.idlok(False)
 curses.noecho()
@@ -155,8 +164,6 @@ while stack:
 		for q in qlinha:
 			q.draw()
 	p.draw()
-	if len(stack)==1:
-		maze = [[plane[j][i] for i in range(x)] for j in range(y)]
 	refresh()
 	k = randrange(4)
 	if k==0:
@@ -284,24 +291,24 @@ def povDraw():
 				height=0
 			if green1:
 				if height%2:
-					plane[height][angle+halfX]="Y"
+					stdscr.addch(height,angle+halfX," ",curses.color_pair(3))
 				else:
-					plane[height][angle+halfX]="#"
+					stdscr.addch(height,angle+halfX," ",curses.color_pair(7))
 			elif green2:
 				if not height%2:
-					plane[height][angle+halfX]="Y"
+					stdscr.addch(height,angle+halfX,curses.color_pair(3))
 				else:
-					plane[height][angle+halfX]="#"
+					stdscr.addch(height,angle+halfX," ",curses.color_pair(7))
 			elif edge:
-				plane[height][angle+halfX]="#"
+				stdscr.addch(height,angle+halfX," ",curses.color_pair(7))
 			elif white:
-				plane[height][angle+halfX]="X"
+				stdscr.addch(height,angle+halfX," ",curses.color_pair(1))
 			elif dgray:
-				plane[height][angle+halfX]="J"
+				stdscr.addch(height,angle+halfX," ",curses.color_pair(6))
 			elif gray:
-				plane[height][angle+halfX]="H"
+				stdscr.addch(height,angle+halfX," ",curses.color_pair(5))
 			elif lgray:
-				plane[height][angle+halfX]="G"
+				stdscr.addch(height,angle+halfX," ",curses.color_pair(4))
 
 class Player:
 	x=0
@@ -326,14 +333,23 @@ otime = time()
 walkingSpeed=2
 turningSpeed=0.25
 p=pos()
+
+
+plane = [[" " for cols in range(x)] for rows in range(y)]
+for qlinha in quadrados:
+	for q in qlinha:
+		q.drawArray()
+maze = [[plane[j][i] for i in range(x)] for j in range(y)]
+
+
 while 1:
+	
 	atime = time()
 	difftime = atime-otime
 	otime=atime
 	for j in range(floor(y/2),y):
 		for i in range(x):
-			plane[j][i]="H"
-
+			stdscr.addch(j-1,i," ",curses.color_pair(5))
 
 	povDraw()
 	for qlinha in quadrados:
@@ -373,5 +389,5 @@ while 1:
 		player.x=mX*4-2
 		player.y=mX*4-2
 	player.a=player.angle%2-1
-	subprocess.run(['sleep','0.005'])
+	#subprocess.run(['sleep','0.05'])
 curses.endwin()
